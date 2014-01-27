@@ -9,9 +9,11 @@ var ObjectFrame = function(object) {
 
 _.extend(ObjectFrame.prototype, {
   getNextToken : function() {
+console.log("Inside /Users/terranceford/JFDL/objecttokenizer/objectframe.js.getNextToken, got called on objct frame:.\n", this);
     var nextToken = null;
     var key = null;
 
+    // If the object frame is all used up ( make function ).
     if (this._position >= 2 * this._keys.length) {
       return null;
     }
