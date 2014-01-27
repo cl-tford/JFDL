@@ -46,7 +46,7 @@ table[4] = {
   '}'      : new ShiftTransition(8),
   'key_a'  : new ShiftTransition(6),
   'key_b'  : new ShiftTransition(7),
-  'APAIR'  : new ShiftTransition(9)
+  'APAIR'  : new GotoTransition(9)
 };
 
 table[5] = {
@@ -67,7 +67,8 @@ table[7] = {
 table[8] = {
   '}'     : new ReduceTransition(1),
   'key_a' : new ReduceTransition(1),
-  'key_b' : new ReduceTransition(1)
+  'key_b' : new ReduceTransition(1),
+  'eof'   : new ReduceTransition(1)
 };
 
 table[9] = {
@@ -90,7 +91,8 @@ table[11] = {
 
 var lrparser = new LRParser({
   grammar : grammar,
-  table   : table
+  table   : table,
+  acceptingState : 3
 });
 
 var testObject = {
@@ -103,3 +105,16 @@ var testObject = {
 var result = lrparser.parse(testObject);
 
 console.log("The result is:\n", result);
+
+var testObject2 = {
+  a : {
+    b : 2
+  },
+  b : '1'
+};
+
+var error = {};
+var result = lrparser.parse(testObject2, error);
+
+console.log("The result is:\n", result);
+console.log("The error object is:\n", error);

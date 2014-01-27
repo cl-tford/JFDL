@@ -12,7 +12,6 @@ var ObjectTokenizer = function(object) {
 
 _.extend(ObjectTokenizer.prototype, StackManager.prototype, {
   getNextToken : function() {
-console.log("Inside /Users/terranceford/JFDL/objecttokenizer/objecttokenizer.js, getNextToken, got called.\n");
     var stackTop = this.getStackTop();
     var nextToken = null;
 
@@ -27,7 +26,6 @@ console.log("Inside /Users/terranceford/JFDL/objecttokenizer/objecttokenizer.js,
     if (nextToken = stackTop.getNextToken()) { 
 
       // The object has not been used up yet.
-console.log("Inside /Users/terranceford/JFDL/objecttokenizer/objecttokenizer.js, about to handle token:\n", nextToken);
       return this._handleNextToken(nextToken);
     }
 

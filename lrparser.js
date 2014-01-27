@@ -7,13 +7,15 @@ var LRParser = function(options) {
   StackManager.call(this);
   this.grammar = options.grammar || [];
   this.table  = options.table || [];
+  this.acceptingState = options.acceptingState || 0;
 };
 
 _.extend(LRParser.prototype, StackManager.prototype, {
 
-  parse : function(object) {
+  parse : function(object, error) {
     var transition = null;
-
+    
+    error = error || {};
     this._tokenizer = new ObjectTokenizer(object);
     this.initializeStack();
     this._state = 0;
@@ -22,6 +24,7 @@ _.extend(LRParser.prototype, StackManager.prototype, {
       this._loadToken();
       transition = this._getTransition();
       if (!transition) {
+        error.reason = "Unexpected token : " + JSON.stringify(this._token);
         return null; // Failure :(
       }
       if (transition.isShift()) {
@@ -58,7 +61,7 @@ _.extend(LRParser.prototype, StackManager.prototype, {
   _reduce : function(transition) {
     var production    = this.grammar[transition.productionNumber];
     var lhs           = production.lhs;
-    var previousState = this.popMultiple(production.rhs.length);
+    var previousState = this.popMultiple(production.rhs.length * 2);
     var newState      = this.table[previousState][lhs].newState;
 
     this._stack.push(previousState);

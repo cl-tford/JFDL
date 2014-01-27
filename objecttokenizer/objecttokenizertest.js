@@ -17,4 +17,5 @@ var objectToken = null;
 
 while(objectToken = objectTokenizer.getNextToken()) {
   console.log(objectToken);
+  console.log("Id:\n", objectToken.getId());
 }

@@ -6,4 +6,8 @@ var ReduceTransition = function(productionNumber) {
   this.productionNumber = productionNumber;
 };
 
+_.extend(ReduceTransition.prototype, TransitionBase.prototype, {
+
+});
+
 module.exports = ReduceTransition;

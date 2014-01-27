@@ -9,7 +9,6 @@ var ObjectFrame = function(object) {
 
 _.extend(ObjectFrame.prototype, {
   getNextToken : function() {
-console.log("Inside /Users/terranceford/JFDL/objecttokenizer/objectframe.js.getNextToken, got called on objct frame:.\n", this);
     var nextToken = null;
     var key = null;
 
