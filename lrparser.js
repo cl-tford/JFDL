@@ -24,7 +24,7 @@ _.extend(LRParser.prototype, StackManager.prototype, {
       this._loadToken();
       transition = this._getTransition();
       if (!transition) {
-        error.reason = "Unexpected token : " + JSON.stringify(this._token);
+        error.reason = this._buildErrorMessage();
         return null; // Failure :(
       }
       if (transition.isShift()) {
@@ -67,6 +67,21 @@ _.extend(LRParser.prototype, StackManager.prototype, {
     this._stack.push(previousState);
     this._stack.push(lhs);
     this._state = newState;
+  },
+
+  _buildErrorMessage : function() {
+    var keyPath          = this._tokenizer.getKeyPath();
+    var objectFrame      = this._tokenizer.getStackTop();
+    var errorMessage     = null;
+    var stringifiedValue = null;
+
+    if (objectFrame.wasOnValue()) {
+      stringifiedValue = JSON.stringify(this._token._data);
+      errorMessage = 'Unexpected value ' + stringifiedValue + ' for ' + keyPath;
+    } else {
+      errorMessage = 'Unexpected key ' + keyPath;
+    }
+    return errorMessage;
   }
 
 });

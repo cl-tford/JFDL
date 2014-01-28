@@ -34,6 +34,21 @@ _.extend(ObjectTokenizer.prototype, StackManager.prototype, {
     return ObjectToken.STOP;
   },
 
+  getKeyPath : function() {
+    var keyPath     = '';
+    var i           = null;
+    var objectFrame = null;
+
+    for (i = 0; i < this._stack.length; i++) {
+      objectFrame = this._stack[i];
+      keyPath = keyPath + objectFrame.getLastKey();
+      if (i <= this._stack.length - 2) {
+        keyPath = keyPath + '.';
+      }
+    }
+    return keyPath;
+  },
+
   _handleNextToken : function(nextToken) {
 
     // Return keys or atomic values.
@@ -45,7 +60,6 @@ _.extend(ObjectTokenizer.prototype, StackManager.prototype, {
     
     // Otherwise, start a whole new object.
     this._stack.push(new ObjectFrame(nextToken._data));
-//    return OBJECT_START_TOKEN;
     return ObjectToken.START;
   }
 });

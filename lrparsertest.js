@@ -108,13 +108,28 @@ console.log("The result is:\n", result);
 
 var testObject2 = {
   a : {
-    b : 2
+    b : '22'
   },
   b : '1'
 };
 
 var error = {};
 var result = lrparser.parse(testObject2, error);
+
+console.log("The result is:\n", result);
+console.log("The error object is:\n", error);
+
+
+var testObject3 = {
+  a : {
+    b : 22
+  },
+  b : 1,
+  c : 5
+};
+
+var error = {};
+var result = lrparser.parse(testObject3, error);
 
 console.log("The result is:\n", result);
 console.log("The error object is:\n", error);

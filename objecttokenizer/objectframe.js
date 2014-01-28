@@ -21,22 +21,47 @@ _.extend(ObjectFrame.prototype, {
     return nextToken;
   },
 
-  _getTokenAtPosition : function() {
-    var key   = null;
+  isOnValue : function(position) {  
+    var currentRemainder = this._getRemainder(position);
 
-    if (this._position % 2) { // Return a value.
-      key = this._keys[(this._position - 1) / 2];
+    return (currentRemainder == 1) ? true : false;
+  },
+
+  wasOnValue : function() {
+    return this.isOnValue(this._position - 1);
+  },
+
+  getKey : function(position) {
+    var remainder = this._getRemainder(position);
+    var keyIndex = (position - remainder) / 2;
+
+    return this._keys[keyIndex];
+  },
+
+  getLastKey : function() {
+    return this.getKey(this._position - 1);
+  },
+
+  _getTokenAtPosition : function() {
+    var key   = this.getKey(this._position);
+
+    if (this.isOnValue(this._position)) {
       return new ObjectToken({
         type : 'value',
         data : this._object[key]
       });
     } 
-    key = this._keys[this._position / 2];
+
+    // Otherwise, we're on a key.
     return new ObjectToken({
       type : 'key',
       data : key
     });
-  }
+  },
+
+  _getRemainder : function(position) {
+    return position % 2;
+  },
 });
 
 module.exports = ObjectFrame;
