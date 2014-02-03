@@ -12,13 +12,17 @@ var grammar = new Array(6);
 
 console.log("Inside /Users/terranceford/JFDL/lrparsertest.js, about to construct a new production.\n");
 
-grammar[0] = new Production(['PHI',    '->', 'A', 'eof']);
+grammar[0] = new Production('PHI -> A eof');
 
-grammar[1] = new Production(['A',      '->', '{', 'APAIRS', '}']);
-grammar[2] = new Production(['APAIRS', '->', 'APAIRS', 'APAIR']);
-grammar[3] = new Production(['APAIRS', '->', 'APAIR']);
-grammar[4] = new Production(['APAIR', '->', 'key_a', 'A']);
-grammar[5] = new Production(['APAIR', '->', 'key_b', 'number']);
+grammar[1] = new Production('A -> { APAIRS }');
+
+grammar[2] = new Production('APAIRS -> APAIRS APAIR');
+
+grammar[3] = new Production('APAIRS -> APAIR');
+
+grammar[4] = new Production('APAIR -> key_a A');
+
+grammar[5] = new Production('APAIR -> key_b number');
 
 console.log("Inside /Users/terranceford/JFDL/lrparsertest.js, just got done constructing the grammar, it looks like:\n", grammar);
 

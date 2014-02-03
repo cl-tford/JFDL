@@ -6,8 +6,10 @@ function isArrow(symbol) {
   return isArrowRegex.test(symbol);
 }
 
-var Production = function(symbols) {
+var Production = function(string) {
+  var symbols = string.split(' ');
   Production.checkFormat(symbols);
+  this._string = string;
   this._symbols = symbols;
   this.lhs = symbols[0];
   this.rhs = symbols.slice(2);
