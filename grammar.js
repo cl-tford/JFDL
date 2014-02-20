@@ -6,10 +6,22 @@ function Grammar(productions) {
   this.symbols = null;
   this.hasTerminal = null;
   this.hasNonterminal = null;
+  this.productionsFor = {};
+  this.maxRHSLength = 0;
   this._analyzeProductions();
 }
 
 _.extend(Grammar.prototype, {
+
+  index : function(production) {
+    var i = null;
+
+    for (i = 0; i < this.productions.length; i++) {
+      if (this.productions[i].isEqual(production)) {
+        return i;
+      }
+    }
+  },
   
   _initializeProductions : function(productionStrings) {
     var productionObjects = [];
@@ -28,6 +40,13 @@ _.extend(Grammar.prototype, {
     self.hasNonterminal = {};
     _.each(self.productions, function(production) {
       self._analyzeProduction(production);
+      if (!self.productionsFor[production.lhs]) {
+        self.productionsFor[production.lhs] = [];
+      }
+      self.productionsFor[production.lhs].push(production);
+      if (production.rhs.length > self.maxRHSLength) {
+        self.maxRHSLength = production.rhs.length;
+      }
     });
   },
 

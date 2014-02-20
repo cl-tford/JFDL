@@ -23,6 +23,16 @@ _.extend(Production, {
       throw new Error("Production format not valid.");
     }
   }
+});
+
+_.extend(Production.prototype, {
+
+  isEqual : function(production) {
+    if (production._string === this._string) {
+      return true;
+    }
+    return false;
+  }
 
 });
 

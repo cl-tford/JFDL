@@ -6,11 +6,21 @@ var ItemSet = function(options) {
   this._grammar = options.grammar;
   this._itemsByKey = {};
   this._stack = [];
+  this.completeItems = [];
+  this.readyFor = {};
 }
 
 _.extend(ItemSet.prototype, {
+
   addItem : function(item) {
-    this._itemsByKey[item.key] = item;
+    if (!this._itemsByKey[item.key]) {
+      this._itemsByKey[item.key] = item;
+      if (item.isComplete()) {
+        this.completeItems.push(item);
+      } else {
+        this._addReadyForItem(item);
+      }
+    }
   },
 
   hasItem : function(item) {
@@ -33,12 +43,10 @@ _.extend(ItemSet.prototype, {
     while (this._stack.length) {
       item = this._stack.shift();
       symbol = item.getSymbol();
-      if (this._grammar.hasNonterminal(symbol)) {
+      if (this._grammar.hasNonterminal[symbol]) {
         this._addPredictedItems(symbol);
       }
     }
-console.log("Inside computeClosure, the calling object looks like:\n", this);
-console.log("about to call _computeKey\n");
     this.key = this._computeKey();
     return this.key;
   },
@@ -54,6 +62,15 @@ console.log("about to call _computeKey\n");
         self._stack.push(proposedItem);
       }
     });
+  },
+
+  _addReadyForItem : function(item) {
+    var symbol = item.getSymbol();
+
+    if (!this.readyFor[symbol]) {
+      this.readyFor[symbol] = [];
+    }
+    this.readyFor[symbol].push(item);
   },
 
   _computeKey : function() {

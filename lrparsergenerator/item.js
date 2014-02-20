@@ -13,6 +13,23 @@ _.extend(Item.prototype, {
   getSymbol : function() {
     return this._production.rhs[this._position];
   },
+
+  isComplete : function() {
+    if (this._position >= this._production.rhs.length) {
+      return true;
+    }
+    return false;
+  },
+
+  advance : function() {
+    var advancedItem = new Item({
+      grammar    : this._grammar,
+      production : this._production,
+      position   : this._position++
+    });
+
+    return advancedItem;
+  },
   
   _computeKey : function() {
 console.log("Inside /Users/terranceford/JFDL/lrparsergenerator/item.js._computeKey, got called\n");
