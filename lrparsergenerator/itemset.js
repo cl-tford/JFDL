@@ -74,7 +74,6 @@ _.extend(ItemSet.prototype, {
   },
 
   _computeKey : function() {
-console.log("Inside _computeKey, got called\n");
     var itemKeys = _.map(_.values(this._itemsByKey), function(item) {
       return item.key;
     });
@@ -82,7 +81,6 @@ console.log("Inside _computeKey, got called\n");
     itemKeys.sort(function(a, b) {
       return Number(a) - Number(b);
     });
-console.log("The sorted item keys are:\n", itemKeys);
     return itemKeys.join('_');
   }
 });

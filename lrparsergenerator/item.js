@@ -1,21 +1,19 @@
 var _ = require('underscore');
 
 var Item = function(options) {
-console.log("Inside Item constructor, got called with options:\n");
   this._grammar = options.grammar;
-  this._production = options.production;
+  this.production = options.production;
   this._position = options.position;
-console.log("Inside Item constructor, about to call _computeKey\n");
   this.key = this._computeKey();
 };
 
 _.extend(Item.prototype, {
   getSymbol : function() {
-    return this._production.rhs[this._position];
+    return this.production.rhs[this._position];
   },
 
   isComplete : function() {
-    if (this._position >= this._production.rhs.length) {
+    if (this._position >= this.production.rhs.length) {
       return true;
     }
     return false;
@@ -24,19 +22,17 @@ _.extend(Item.prototype, {
   advance : function() {
     var advancedItem = new Item({
       grammar    : this._grammar,
-      production : this._production,
-      position   : this._position++
+      production : this.production,
+      position   : this._position + 1
     });
 
     return advancedItem;
   },
   
   _computeKey : function() {
-console.log("Inside /Users/terranceford/JFDL/lrparsergenerator/item.js._computeKey, got called\n");
-//    var mod = this._grammar.maxProductionLength;
-    var mod = this._grammar.maxRHSLength;
-    var prodNum = this._grammar.index(this._production);
-console.log("Inside /Users/terranceford/JFDL/lrparsergenerator/item.js._computeKey, about to return: \n", prodNum * mod + this._position);
+    var mod = this._grammar.maxRHSLength + 1;
+    var prodNum = this._grammar.index(this.production);
+
     return prodNum * mod + this._position;
   }
 });

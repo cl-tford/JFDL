@@ -13,6 +13,7 @@ var LRParserGenerator = function(productionStrings) {
   this._firsts = this._computeFirsts();
   this._followers = this._computeFollowers();
   this._transitionTable = null;
+  this._itemsetIndices = null;
 };
 
 _.extend(LRParserGenerator.prototype, {
@@ -27,7 +28,6 @@ _.extend(LRParserGenerator.prototype, {
     this._unprocessedItemsets = [initialItemset];
     while (this._unprocessedItemsets.length) {
       currentItemset = this._unprocessedItemsets.shift();
-console.log("Inside generate, considering itemset:\n", currentItemset);
       this._processItemset(currentItemset);
     }
     return new LRParser({
@@ -37,18 +37,16 @@ console.log("Inside generate, considering itemset:\n", currentItemset);
   },
 
   _processItemset : function(itemset) {
-console.log("Inside processItemset, got called, about to makeAllSymbolTransitions\n");
     this._makeAllSymbolTransitions(itemset);
-console.log("Inside processItemset, about to addAllReductions.\n");
     this._addAllReductions(itemset);
   },
 
   _makeAllSymbolTransitions : function(itemset) {
-console.log("Inside makeAllSymbolTransitions, got called.\n");
     var self = this;
-console.log("Inside makeAllSymbolTransitions, about to loop through the itemset's readyFor hash, which looks like:\n", itemset.readyFor);
+
     _.each(itemset.readyFor, function(items, symbol) {
       var newItemset = self._makeSymbolTransition(itemset, symbol);
+
       if (newItemset) {
         self._unprocessedItemsets.push(newItemset);
       }
@@ -56,7 +54,6 @@ console.log("Inside makeAllSymbolTransitions, about to loop through the itemset'
   },
 
   _addAllReductions : function(itemset) {
-console.log("Inside addAllReductions, got called.\n");
     var self  = this;
     var state = self._indexItemset(itemset);
 
@@ -66,12 +63,10 @@ console.log("Inside addAllReductions, got called.\n");
   },
 
   _makeSymbolTransition : function(itemset, symbol) {
-console.log("Inside makeSymbolTransition, got called with itemset, symbol:\n", itemset, symbol);
     var transition      = null;
     var state           = this._indexItemset(itemset);
-console.log("inside makeSymbolTransition, the result of indexItemset is:\n", state);
     var proposedItemset = this._advanceItemset(itemset, symbol);
-    var isNew           = this._containsItemset(proposedItemset);
+    var isNew           = !this._containsItemset(proposedItemset);
     var newState        = this._indexItemset(proposedItemset);
 
     if (this._grammar.hasTerminal[symbol]) {
@@ -92,7 +87,7 @@ console.log("inside makeSymbolTransition, the result of indexItemset is:\n", sta
     var productionNumber = self._indexProduction(item.production);
     var reduction = new ReduceTransition(productionNumber);
 
-    _.each(self._followers[item.production.lhs], function(symbol) {
+    _.each(_.keys(self._followers[item.production.lhs]), function(symbol) {
       self._installTransition(state, symbol, reduction);
     });
   },
@@ -117,6 +112,7 @@ console.log("inside makeSymbolTransition, the result of indexItemset is:\n", sta
     });
 
     _.each(itemset.readyFor[symbol], function(item) {
+      var advancedItem = item.advance();
       advancedItemset.addItem(item.advance());
     });
     advancedItemset.computeClosure();
@@ -124,18 +120,17 @@ console.log("inside makeSymbolTransition, the result of indexItemset is:\n", sta
   },
 
   _indexItemset : function(itemset) {
-console.log("Inside indexItemset, got called.\n");
     if (this._containsItemset(itemset)) {
-console.log("Inside indexItemset, think this already contains the itemset\n");
       return this._itemsetIndices[itemset.key];
     }
-console.log("Inside indexItemsets, about to addItemset and return result.\n");
     return this._addItemset(itemset);
   },
 
+  _indexProduction : function(production) {
+    return this._grammar.index(production);
+  },
+
   _installTransition : function(state, symbol, transition) {
-console.log("INside _installTransition, got called with state, symbol:\n", state, symbol);
-console.log("inside /Users/terranceford/JFDL/lrparsergenerator/lrparsergenerator.js._installTransition, the current transition table looks like:\n", this._transitionTable);
     this._transitionTable[state][symbol] = transition;
   },
 
@@ -147,7 +142,6 @@ console.log("inside /Users/terranceford/JFDL/lrparsergenerator/lrparsergenerator
   },
   
   _addItemset : function(itemset) {
-//    var newItemsetIndex = this._itemsetIndices.length;
     var newItemsetIndex = this._transitionTable.length;
 
     this._transitionTable.push({});
@@ -268,7 +262,6 @@ console.log("inside /Users/terranceford/JFDL/lrparsergenerator/lrparsergenerator
     });
     return followers;
   }
-
 
 });
 
