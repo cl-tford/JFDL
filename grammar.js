@@ -11,7 +11,17 @@ function Grammar(productions) {
   this._analyzeProductions();
 }
 
+_.extend(Grammar, {
+  newProduction : function(productionString) {
+    return new Production(productionString);
+  }
+});
+
 _.extend(Grammar.prototype, {
+
+  getProduction : function(index) {
+    return this.productions[index];
+  },
 
   index : function(production) {
     var i = null;
@@ -22,12 +32,12 @@ _.extend(Grammar.prototype, {
       }
     }
   },
-  
+
   _initializeProductions : function(productionStrings) {
     var productionObjects = [];
 
     _.each(productionStrings, function(productionString) {
-      productionObjects.push(new Production(productionString));
+      productionObjects.push(Grammar.newProduction(productionString));
     });
     return productionObjects;
   },

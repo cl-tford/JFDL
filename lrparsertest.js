@@ -6,8 +6,6 @@ var ReduceTransition = require('./transition/reducetransition.js');
 var GotoTransition   = require('./transition/gototransition.js');
 
 
-
-
 var grammar = new Array(6);
 
 console.log("Inside /Users/terranceford/JFDL/lrparsertest.js, about to construct a new production.\n");
@@ -23,6 +21,10 @@ grammar[3] = new Production('APAIRS -> APAIR');
 grammar[4] = new Production('APAIR -> key_a A');
 
 grammar[5] = new Production('APAIR -> key_b number');
+
+grammar.getProduction = function(index) {
+  return grammar[index];
+}
 
 console.log("Inside /Users/terranceford/JFDL/lrparsertest.js, just got done constructing the grammar, it looks like:\n", grammar);
 
@@ -133,7 +135,7 @@ var testObject3 = {
 };
 
 var error = {};
-var result = lrparser.parse(testObject3, error);
+//var result = lrparser.parse(testObject3, error);
 
-console.log("The result is:\n", result);
-console.log("The error object is:\n", error);
+//console.log("The result is:\n", result);
+//console.log("The error object is:\n", error);

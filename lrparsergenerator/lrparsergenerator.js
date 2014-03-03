@@ -8,12 +8,15 @@ var Item             = require('./item.js');
 var util             = require('./util.js');
 var _                = require('underscore');
 
+var EOFSYMBOL = 'eof';
+
 var LRParserGenerator = function(productionStrings) {
-  this._grammar = new Grammar(productionStrings);
+  this._grammar = this._makeAugmentedGrammar(productionStrings);
   this._firsts = this._computeFirsts();
   this._followers = this._computeFollowers();
   this._transitionTable = null;
   this._itemsetIndices = null;
+  this._acceptingState = null;
 };
 
 _.extend(LRParserGenerator.prototype, {
@@ -31,9 +34,19 @@ _.extend(LRParserGenerator.prototype, {
       this._processItemset(currentItemset);
     }
     return new LRParser({
-      grammar : this._grammar,
-      table   : this._transitionTable
+      grammar        : this._grammar,
+      table          : this._transitionTable,
+      acceptingState : this._acceptingState
     });
+  },
+
+  _makeAugmentedGrammar : function(productions) {
+    var mainProduction       = Grammar.newProduction(productions[0]);
+    var startSymbol          = mainProduction.lhs;
+    var augmentedProduction  = "PHI -> " + startSymbol + " " + EOFSYMBOL;
+
+    productions.unshift(augmentedProduction);
+    return new Grammar(productions);
   },
 
   _processItemset : function(itemset) {
@@ -74,6 +87,7 @@ _.extend(LRParserGenerator.prototype, {
     } else { // Symbol is nonterminal
       transition = new GotoTransition(newState);
     }
+
     this._installTransition(state, symbol, transition);
     if (isNew) {
       return proposedItemset;
@@ -131,6 +145,9 @@ _.extend(LRParserGenerator.prototype, {
   },
 
   _installTransition : function(state, symbol, transition) {
+    if (symbol === EOFSYMBOL && transition.isShift()) {
+      this._acceptingState = transition.state;
+    }
     this._transitionTable[state][symbol] = transition;
   },
 

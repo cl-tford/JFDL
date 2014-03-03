@@ -8,6 +8,7 @@ var LRParser = function(options) {
   this.grammar = options.grammar || [];
   this.table  = options.table || [];
   this.acceptingState = options.acceptingState || 0;
+  this.tokenizer = options.tokenizer || ObjectTokenizer;
 };
 
 _.extend(LRParser.prototype, StackManager.prototype, {
@@ -16,7 +17,7 @@ _.extend(LRParser.prototype, StackManager.prototype, {
     var transition = null;
     
     error = error || {};
-    this._tokenizer = new ObjectTokenizer(object);
+    this._tokenizer = new this.tokenizer(object);
     this.initializeStack();
     this._state = 0;
     this._token = null;
@@ -47,7 +48,6 @@ _.extend(LRParser.prototype, StackManager.prototype, {
 
   _getTransition : function() {
     var tokenId = this._token.getId();
-
     return this.table[this._state][tokenId];
   },
 
@@ -59,7 +59,7 @@ _.extend(LRParser.prototype, StackManager.prototype, {
   },
 
   _reduce : function(transition) {
-    var production    = this.grammar[transition.productionNumber];
+    var production    = this.grammar.getProduction(transition.productionNumber);
     var lhs           = production.lhs;
     var previousState = this.popMultiple(production.rhs.length * 2);
     var newState      = this.table[previousState][lhs].newState;
