@@ -25,6 +25,14 @@ _.extend(Grammar.prototype, {
     return this._productions[index];
   },
 
+  getProductions : function() {
+    return this._productions;
+  },
+
+  getReduction : function(index) {
+    return this._reductions[index];
+  },
+
   index : function(production) {
     var i = null;
 
@@ -35,13 +43,15 @@ _.extend(Grammar.prototype, {
     }
   },
 
-  initialize : function(grammarData) {
+  _initialize : function(grammarData) {
     var self = this;
+    self._productions = [];
+    self._reductions = []
     _.each(grammarData, function(grammarDatum) {
       var productionString = grammarDatum.production;
 
-      this._productions.push(new Production(productionString));
-      this._reductions.push(grammarDatum.reduction);
+      self._productions.push(new Production(productionString));
+      self._reductions.push(grammarDatum.reduction);
     });
   },
 

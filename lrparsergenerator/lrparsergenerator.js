@@ -10,8 +10,8 @@ var _                = require('underscore');
 
 var EOFSYMBOL = 'eof';
 
-var LRParserGenerator = function(productionStrings) {
-  this._grammar = this._makeAugmentedGrammar(productionStrings);
+var LRParserGenerator = function(grammarData) {
+  this._grammar = this._makeAugmentedGrammar(grammarData);
   this._firsts = this._computeFirsts();
   this._followers = this._computeFollowers();
   this._transitionTable = null;
@@ -40,13 +40,17 @@ _.extend(LRParserGenerator.prototype, {
     });
   },
 
-  _makeAugmentedGrammar : function(productions) {
-    var mainProduction       = Grammar.newProduction(productions[0]);
-    var startSymbol          = mainProduction.lhs;
-    var augmentedProduction  = "PHI -> " + startSymbol + " " + EOFSYMBOL;
+  _makeAugmentedGrammar : function(grammarData) {
+    var firstProduction     = grammarData[0].production;
+    var mainProduction      = Grammar.newProduction(firstProduction);
+    var startSymbol         = mainProduction.lhs;
+    var augmentedProduction = "PHI -> " + startSymbol + " " + EOFSYMBOL;
 
-    productions.unshift(augmentedProduction);
-    return new Grammar(productions);
+    grammarData.unshift({
+      production : augmentedProduction
+    });
+    var newGrammar = new Grammar(grammarData);
+    return newGrammar;
   },
 
   _processItemset : function(itemset) {
@@ -113,7 +117,7 @@ _.extend(LRParserGenerator.prototype, {
     
     initialItemset.addItem(new Item({
       grammar    : this._grammar,
-      production : this._grammar.productions[0],
+      production : this._grammar.getProduction(0),
       position   : 0
     }));
     initialItemset.computeClosure();
@@ -174,7 +178,7 @@ _.extend(LRParserGenerator.prototype, {
     changed = true;
     while (changed) {
       changed = false;
-      _.each(self._grammar.productions, function(production) {
+      _.each(self._grammar.getProductions(), function(production) {
         var lhs = production.lhs;
         var leftCorner = production.rhs[0];
         if (util.installKeys({
@@ -196,7 +200,7 @@ _.extend(LRParserGenerator.prototype, {
     changed = true;
     while (changed) {
       changed = false;
-      _.each(self._grammar.productions, function(production) {
+      _.each(self._grammar.getProductions(), function(production) {
         if (self._installFollowersByProduction(followers, production)) {
           changed = true;
         }

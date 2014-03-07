@@ -2,9 +2,8 @@ var LRParserGenerator = require('./lrparsergenerator.js');
 var GotoTransition    = require('../transition/gototransition.js');
 var ReduceTransition  = require('../transition/reducetransition.js');
 var ShiftTransition   = require('../transition/shifttransition.js');
-
-var assert = require('chai').assert;
-//console.log("Inside the test, the result of requiring chai is:\n", require('chai'));
+var _                 = require('underscore');
+var assert            = require('chai').assert;
 
 /*
 var productionStrings = [
@@ -50,7 +49,6 @@ describe('LRParserGenerator', function() {
   it('should generate the right parsing table for a simple grammar', function() {
 
     var testProductionStrings = [
-      'PHI -> A eof',
       'A -> { APAIRS }',
       'APAIRS -> APAIRS APAIR',
       'APAIRS -> APAIR',
@@ -58,10 +56,13 @@ describe('LRParserGenerator', function() {
       'APAIR -> key_b number'
     ];
 
-    var testLRParser = (new LRParserGenerator(testProductionStrings)).generate();
+    var grammarData = _.map(testProductionStrings, function(productionString) {
+      return {
+        production : productionString
+      };
+    });
 
-//    console.log("Inside lrparsergenerator.js, after generating the testLRParser, the table is:\n", testLRParser.table);
-
+    var testLRParser = (new LRParserGenerator(grammarData)).generate();
 
     var table = new Array(12);
 
