@@ -14,14 +14,15 @@ _.extend(StackManager.prototype, {
   },
 
   popMultiple : function(howManyPops) {
-    var i = null;
-    var poppedValue = null;
+    var popped = [];
+    var i      = null;
 
     for (i = 0; i < howManyPops; i++) {
-      poppedValue = this._stack.pop();
+      popped.unshift(this._stack.pop());
     }
-    return poppedValue;
+    return popped;
   }
+
 });
 
 

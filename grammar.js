@@ -1,13 +1,15 @@
 var _ = require('underscore');
 var Production = require('./production.js');
 
-function Grammar(productions) {
-  this.productions = this._initializeProductions(productions);
+function Grammar(grammarData) {
   this.symbols = null;
   this.hasTerminal = null;
   this.hasNonterminal = null;
   this.productionsFor = {};
   this.maxRHSLength = 0;
+  this._productions = null;
+  this._reductions = null;
+  this._initialize(grammarData);
   this._analyzeProductions();
 }
 
@@ -20,35 +22,36 @@ _.extend(Grammar, {
 _.extend(Grammar.prototype, {
 
   getProduction : function(index) {
-    return this.productions[index];
+    return this._productions[index];
   },
 
   index : function(production) {
     var i = null;
 
-    for (i = 0; i < this.productions.length; i++) {
-      if (this.productions[i].isEqual(production)) {
+    for (i = 0; i < this._productions.length; i++) {
+      if (this._productions[i].isEqual(production)) {
         return i;
       }
     }
   },
 
-  _initializeProductions : function(productionStrings) {
-    var productionObjects = [];
+  initialize : function(grammarData) {
+    var self = this;
+    _.each(grammarData, function(grammarDatum) {
+      var productionString = grammarDatum.production;
 
-    _.each(productionStrings, function(productionString) {
-      productionObjects.push(Grammar.newProduction(productionString));
+      this._productions.push(new Production(productionString));
+      this._reductions.push(grammarDatum.reduction);
     });
-    return productionObjects;
   },
-  
+
   _analyzeProductions : function() {
     var self = this;
 
     self.symbols = {};
     self.hasTerminal = {};
     self.hasNonterminal = {};
-    _.each(self.productions, function(production) {
+    _.each(self._productions, function(production) {
       self._analyzeProduction(production);
       if (!self.productionsFor[production.lhs]) {
         self.productionsFor[production.lhs] = [];

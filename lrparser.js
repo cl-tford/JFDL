@@ -11,6 +11,20 @@ var LRParser = function(options) {
   this.tokenizer = options.tokenizer || ObjectTokenizer;
 };
 
+_.extend(LRParser, {
+  getConstituents : function(popped) {
+    var constituents = [];
+    var i;
+
+    for (i = 0; i < popped.length; i++) {
+      if (i % 2) {
+        constituents.push(popped[i]);
+      }
+    }
+    return constituents;
+  }
+});
+
 _.extend(LRParser.prototype, StackManager.prototype, {
 
   parse : function(object, error) {
@@ -59,13 +73,22 @@ _.extend(LRParser.prototype, StackManager.prototype, {
   },
 
   _reduce : function(transition) {
-    var production    = this.grammar.getProduction(transition.productionNumber);
-    var lhs           = production.lhs;
-    var previousState = this.popMultiple(production.rhs.length * 2);
-    var newState      = this.table[previousState][lhs].newState;
+    var productionNumber = transition.productionNumber;
+    var production       = this.grammar.getProduction(productionNumber);
+    var reduction        = this.grammar.getReduction(productionNumber);
+    var lhs              = production.lhs;
+    var popped           = this.popMultiple(production.rhs.length * 2);
+    var previousState    = popped[0]
+    var newState         = this.table[previousState][lhs].newState;
+    var constituents     = null;
 
     this._stack.push(previousState);
-    this._stack.push(lhs);
+    if (reduction) {
+      constituents = LRParser.getConstituents(popped);
+      this._stack.push(reduction(constituents));
+    } else {
+      this._stack.push(lhs);
+    }
     this._state = newState;
   },
 
