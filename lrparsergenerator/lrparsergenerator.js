@@ -21,7 +21,7 @@ var LRParserGenerator = function(grammarData) {
 
 _.extend(LRParserGenerator.prototype, {
   
-  generate : function() {
+  generate : function(tokenizer) {
     var initialItemset = this._createInitialItemset();
     var currentItemset = null;
 
@@ -36,7 +36,8 @@ _.extend(LRParserGenerator.prototype, {
     return new LRParser({
       grammar        : this._grammar,
       table          : this._transitionTable,
-      acceptingState : this._acceptingState
+      acceptingState : this._acceptingState,
+      tokenizer      : tokenizer
     });
   },
 

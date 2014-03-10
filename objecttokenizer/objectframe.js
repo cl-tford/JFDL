@@ -1,9 +1,15 @@
 var _ = require('underscore');
 var ObjectToken = require('./objecttoken.js');
 
-var ObjectFrame = function(object) {
-  this._object = object;
-  this._keys = _.keys(object);
+
+var ObjectFrame = function(options) {
+  this._TokenModel = options.TokenModel || ObjectToken;
+  this._object = options.object;
+
+  if (!this._object) {
+    throw new Error("Can't construct object frame without object.");
+  }
+  this._keys = _.keys(this._object);
   this._position = 0;
 };
 
@@ -46,14 +52,14 @@ _.extend(ObjectFrame.prototype, {
     var key   = this.getKey(this._position);
 
     if (this.isOnValue(this._position)) {
-      return new ObjectToken({
+      return new this._TokenModel({
         type : 'value',
         data : this._object[key]
       });
     } 
 
     // Otherwise, we're on a key.
-    return new ObjectToken({
+    return new this._TokenModel({
       type : 'key',
       data : key
     });

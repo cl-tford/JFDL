@@ -12,10 +12,13 @@ var testObject = {
   }
 };
 
-var objectTokenizer = new ObjectTokenizer(testObject);
+//var objectTokenizer = new ObjectTokenizer(testObject);
+var objectTokenizer = new ObjectTokenizer({
+  object : testObject
+});
 var objectToken = null;
 
-while(objectToken = objectTokenizer.getNextToken()) {
+while (objectToken = objectTokenizer.getNextToken()) {
   console.log(objectToken);
   console.log("Id:\n", objectToken.getId());
 }

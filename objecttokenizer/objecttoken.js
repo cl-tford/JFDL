@@ -20,6 +20,12 @@ ObjectToken.EOF = new ObjectToken({
 });
 
 _.extend(ObjectToken.prototype, {
+  getType : function() {
+    return this._type;
+  },
+  getData : function() {
+    return this._data;
+  },
   isKey : function() {
     return (this._type == 'key');
   },

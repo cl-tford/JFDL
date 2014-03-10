@@ -31,7 +31,10 @@ _.extend(LRParser.prototype, StackManager.prototype, {
     var transition = null;
     
     error = error || {};
-    this._tokenizer = new this.tokenizer(object);
+//    this._tokenizer = new this.tokenizer(object);
+    this._tokenizer = new this.tokenizer({
+      object : object
+    });
     this.initializeStack();
     this._state = 0;
     this._token = null;

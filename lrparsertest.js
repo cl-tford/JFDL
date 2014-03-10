@@ -4,7 +4,8 @@ var Production       = require('./production.js');
 var ShiftTransition  = require('./transition/shifttransition.js');
 var ReduceTransition = require('./transition/reducetransition.js');
 var GotoTransition   = require('./transition/gototransition.js');
-
+//var ObjectTokenizer  = require('./objecttokenizer/objecttokenizer.js');
+//var ObjectToken      = require('./objecttokenizer/objecttoken.js');
 
 var grammar = new Array(6);
 var reductions = new Array(6);
@@ -233,3 +234,7 @@ var result = lrparser2.parse(testObject3, error);
 
 console.log("The result is:\n", result);
 console.log("The error object is:\n", error);
+
+
+// TEST SCENARIO 3
+

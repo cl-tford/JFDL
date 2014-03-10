@@ -3,10 +3,15 @@ var StackManager = require('../stackmanager.js');
 var ObjectFrame = require('./objectframe.js');
 var ObjectToken = require('./objecttoken.js');
 
-var ObjectTokenizer = function(object) {
+var ObjectTokenizer = function(options) {
+  this._TokenModel = options.TokenModel || ObjectToken;
+  this._object = options.object;
+  if (!this._object) {
+    throw new Error("Can't tokenize nonexistent object\n");
+  }
+
   StackManager.call(this);
   this.initializeStack();
-  this._object = object;
   this._started = false;
 };
 
@@ -19,9 +24,12 @@ _.extend(ObjectTokenizer.prototype, StackManager.prototype, {
       return null;
     }
     if (!stackTop && !this._started) {
-      this._stack.push(new ObjectFrame(this._object));
+      this._stack.push(new ObjectFrame({
+        object     : this._object,
+        TokenModel : this._TokenModel
+      }));
       this._started = true;
-      return ObjectToken.START;
+      return this._TokenModel.START;
     }
     if (nextToken = stackTop.getNextToken()) { 
 
@@ -31,7 +39,7 @@ _.extend(ObjectTokenizer.prototype, StackManager.prototype, {
 
     // Else, The object frame has just ended.
     this._stack.pop();
-    return ObjectToken.STOP;
+    return this._TokenModel.STOP;
   },
 
   getKeyPath : function() {
@@ -59,8 +67,11 @@ _.extend(ObjectTokenizer.prototype, StackManager.prototype, {
     }
     
     // Otherwise, start a whole new object.
-    this._stack.push(new ObjectFrame(nextToken._data));
-    return ObjectToken.START;
+    this._stack.push(new ObjectFrame({
+      object     : nextToken.getData(),
+      TokenModel : this._TokenModel
+    }));
+    return this._TokenModel.START;
   }
 });
 
