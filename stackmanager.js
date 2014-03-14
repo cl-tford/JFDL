@@ -9,6 +9,10 @@ _.extend(StackManager.prototype, {
     this._stack = [];
   },
 
+  getStack : function() {
+    return this._stack.slice(0);
+  },
+
   getStackTop : function() {
     return this._stack[this._stack.length - 1];
   },

@@ -1,6 +1,6 @@
 var _ = require('underscore');
 
-var ObjectToken = function(options) {
+var ObjectToken = function ObjectToken(options) {
   this._type = options.type;
   this._data = options.data;
 };

@@ -9,6 +9,7 @@ var LRParser = function(options) {
   this.table  = options.table || [];
   this.acceptingState = options.acceptingState || 0;
   this.tokenizer = options.tokenizer || ObjectTokenizer;
+  this._beforeParse = null;
 };
 
 _.extend(LRParser, {
@@ -27,17 +28,23 @@ _.extend(LRParser, {
 
 _.extend(LRParser.prototype, StackManager.prototype, {
 
+  beforeParse : function(initializer) {
+    this._beforeParse = initializer;
+  },
+
   parse : function(object, error) {
     var transition = null;
-    
+
     error = error || {};
-//    this._tokenizer = new this.tokenizer(object);
+    this._prepareToParse(object);
+/*
     this._tokenizer = new this.tokenizer({
       object : object
     });
     this.initializeStack();
     this._state = 0;
     this._token = null;
+*/
     while (true) {
       this._loadToken();
       transition = this._getTransition();
@@ -54,6 +61,19 @@ _.extend(LRParser.prototype, StackManager.prototype, {
         this._reduce(transition);
       }
     }
+  },
+
+  _prepareToParse : function(object) {
+    if (this._beforeParse && 
+        typeof this._beforeParse === 'function') {
+      this._beforeParse();
+    }
+    this._tokenizer = new this.tokenizer({
+      object : object
+    });
+    this.initializeStack();
+    this._state = 0;
+    this._token = null;
   },
 
   _loadToken : function() {
@@ -88,7 +108,7 @@ _.extend(LRParser.prototype, StackManager.prototype, {
     this._stack.push(previousState);
     if (reduction) {
       constituents = LRParser.getConstituents(popped);
-      this._stack.push(reduction(constituents));
+      this._stack.push(reduction.call(this, constituents));
     } else {
       this._stack.push(lhs);
     }
