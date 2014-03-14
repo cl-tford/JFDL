@@ -150,6 +150,9 @@ _.extend(LRParserGenerator.prototype, {
   },
 
   _installTransition : function(state, symbol, transition) {
+    if (this._transitionTable[state][symbol]) {
+      throw new Error("Ambiguous grammar"); 
+    }
     if (symbol === EOFSYMBOL && transition.isShift()) {
       this._acceptingState = transition.state;
     }

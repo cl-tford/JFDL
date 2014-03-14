@@ -134,4 +134,24 @@ describe('LRParserGenerator', function() {
     assert.deepEqual(testLRParser.table, table);
     
   });
+
+  it('should throw an error when given an ambiguous grammar', function() {
+
+    var testProductionStrings = [
+      'A -> a A',
+      'A -> A a'
+    ];
+
+    var grammarData = _.map(testProductionStrings, function(productionString) {
+      return {
+        production : productionString
+      };
+    });
+
+    assert.throws(function() {
+      var newLRParser = (new LRParserGenerator(grammarData)).generate();
+    }, /ambiguous/i);
+    
+  });
+
 });
