@@ -1,17 +1,13 @@
 var _ = require('underscore');
+var Mixable = require('./mixable.js');
 
 // Class
 var Node = function Node(options) {
   this._things = options.things || [];
-//  this._results = null;
-  if (!(this instanceof Node)) {
-    _.extend(this, Node.prototype);
-  }
-//  _.extend(this, options);
 };
 
 // Class Methods
-_.extend(Node, {
+_.extend(Node, Mixable, {
 
 });
 
@@ -20,11 +16,6 @@ _.extend(Node.prototype, {
   getThings : function() {
     return this._things.slice(0);
   },
-/*
-  getResults : function() {
-    return this._results;
-  },
-*/
 
   accumulator : function() {
     var self = this;

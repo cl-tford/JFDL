@@ -1,6 +1,5 @@
 var _ = require('underscore');
-//var Module = require('./module.js');
-var Module = require('./module2.js');
+var Module = require('./module.js');
 var Node = require('./test-node.js');
 
 // Class
@@ -8,12 +7,12 @@ var A = function A(options) {
   _.extend(this, options);
 };
 
-Module.call(A, {
+Module.mixin(A, {
   id : 'Test-A',
   dependencies : ['Test-B', 'Test-C']
 });
 
-Node.call(A, {
+Node.mixin(A, {
   things : ['thiga1', 'athing2']
 });
 

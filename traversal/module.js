@@ -1,6 +1,8 @@
 var _ = require('underscore');
+var Mixable = require('./mixable.js');
 
 var modulesById = {};
+
 
 function getModuleById(id) {
   return modulesById[id];
@@ -10,40 +12,45 @@ function storeModuleById(id, module) {
   modulesById[id] = module;
 }
 
-var Module = function Module(id, constructor, dependencies) {
-  if (!dependencies) {
-    dependencies = [];
-  }
-  _.extend(constructor, {
-    getId : function() {
-      return id;
-    },
-    
-    getDependencies : function() {
-      return dependencies.slice(0);
-    },
-    
-    getNeighbors : function() {
-      var neighbors = [];
-
-      _.each(this.getDependencies(), function(dependency) {
-        var module = getModuleById(dependency);
-
-        if (!module) {
-          console.log("Inside getNeighbors, about to require:\n", './' + dependency + './js');
-          module = require('./' + dependency + '.js');
-          storeModuleById(dependency, module);
-        }
-        neighbors.push(module);
-      });
-      return neighbors;
-    },
-
-    getNeighbor : function(id) {
-      return getModuleById(id);
-    }
-  });
-  return constructor;
+// Class
+var Module = function Module(options) {
+  this._id = options.id;
+  this._dependencies = options.dependencies;
 };
 
+// Class Methods
+_.extend(Module, Mixable, {
+  getById : function(id) {
+    var module = getModuleById(id);
+    
+    if (!module) {
+      module = require('./' + id.toLowerCase() + '.js');
+      storeModuleById(id, module);
+    }    
+    return module;
+  }
+});
+
+// Instance Methods
+_.extend(Module.prototype, {
+  getId : function() {
+    return this._id;
+  },
+
+  getDependencies : function() {
+    return this._dependencies.slice(0);
+  },
+
+  getNeighbors : function() {
+    var neighbors = [];
+    
+    _.each(this.getDependencies(), function(dependency) {
+      var module = Module.getById(dependency);
+
+      neighbors.push(module);
+    });
+    return neighbors;
+  }
+});
+   
 module.exports = Module;
