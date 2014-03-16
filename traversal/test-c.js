@@ -1,21 +1,19 @@
 var _ = require('underscore');
-var Module = require('./module.js');
-var Node = require('./test-node.js');
+var TestNode = require('./testnode.js');
 
 // Class
 var C = function C(options) {
   _.extend(this, options);
 };
 
-//Module.call(C, {
-Module.mixin(C, {
-  id : 'Test-C',
-  dependencies : ['Test-A']
+TestNode.call(C, {
+  id           : 'Test-C',
+  dependencies : ['Test-A'],
+  things       : ['c2']
 });
 
-//Node.call(C, {
-Node.mixin(C, {
-  things : ['c2']
+_.extend(C, TestNode.prototype, {
+
 });
 
 module.exports = C;

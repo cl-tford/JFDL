@@ -1,20 +1,32 @@
 var _ = require('underscore');
-var Mixable = require('./mixable.js');
+var Module = require('./module.js');
 
 // Class
-var Node = function Node(options) {
+var TestNode = function TestNode(options) {
+  Module.call(this, options);
   this._things = options.things || [];
 };
 
 // Class Methods
-_.extend(Node, Mixable, {
+_.extend(TestNode, Module, {
 
 });
 
 // Instance Methods
-_.extend(Node.prototype, {
+_.extend(TestNode.prototype, Module.prototype, {
   getThings : function() {
     return this._things.slice(0);
+  },
+
+  getNeighbors : function() {
+    var neighbors = [];
+    
+    _.each(this.getDependencies(), function(dependency) {
+      var module = Module.getById(dependency);
+
+      neighbors.push(module);
+    });
+    return neighbors;
   },
 
   accumulator : function() {
@@ -33,4 +45,4 @@ _.extend(Node.prototype, {
   }
 });
 
-module.exports = Node;
+module.exports = TestNode;

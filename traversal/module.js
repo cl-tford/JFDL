@@ -1,8 +1,7 @@
-var _ = require('underscore');
-var Mixable = require('./mixable.js');
+var _    = require('underscore');
+var Node = require('./node.js');
 
 var modulesById = {};
-
 
 function getModuleById(id) {
   return modulesById[id];
@@ -14,12 +13,12 @@ function storeModuleById(id, module) {
 
 // Class
 var Module = function Module(options) {
-  this._id = options.id;
+  Node.call(this, options);
   this._dependencies = options.dependencies;
 };
 
 // Class Methods
-_.extend(Module, Mixable, {
+_.extend(Module, Node, {
   getById : function(id) {
     var module = getModuleById(id);
     
@@ -32,24 +31,9 @@ _.extend(Module, Mixable, {
 });
 
 // Instance Methods
-_.extend(Module.prototype, {
-  getId : function() {
-    return this._id;
-  },
-
+_.extend(Module.prototype, Node.prototype, {
   getDependencies : function() {
     return this._dependencies.slice(0);
-  },
-
-  getNeighbors : function() {
-    var neighbors = [];
-    
-    _.each(this.getDependencies(), function(dependency) {
-      var module = Module.getById(dependency);
-
-      neighbors.push(module);
-    });
-    return neighbors;
   }
 });
    
