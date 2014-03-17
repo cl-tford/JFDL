@@ -22,6 +22,7 @@ function getKeyPath(stack) {
 
 var SyntaxParser = function SyntaxParser(options) {
   this._startSymbol = options.startSymbol || DEFAULT_START_SYMBOL;
+  this._externalSymbols = options.externalSymbols || [];
   this._grammarData = this._getGrammarData();
   this._generator = new LRParserGenerator(this._grammarData);
   this._parser = this._generator.generate(SyntaxTokenizer);
@@ -78,7 +79,8 @@ _.extend(SyntaxParser.prototype, {
       },
       {
         production : 'VALUE -> ' + this._startSymbol,
-        reduction : this._startSymbolAsValue()
+//        reduction : this._startSymbolAsValue()
+        reduction : this._nonterminalAsValue()
       },
       {
         production : 'ATOM -> string',
@@ -93,7 +95,21 @@ _.extend(SyntaxParser.prototype, {
         reduction : this._booleanAsAtom()
       }
     ];
-    return grammarData;
+//    this._addExternalGrammarData(grammarData);//
+    return grammarData.concat(this._getExternalGrammarData());
+  },
+
+  _getExternalGrammarData : function() {
+    var self = this;
+    var externalGrammarData = [];
+    
+    _.each(self._externalSymbols, function(externalSymbol) {
+      externalGrammarData.push({
+        production : 'VALUE -> ' + externalSymbol,
+        reduction  : self._nonterminalAsValue()
+      });
+    });
+    return externalGrammarData;
   },
 
   _compressSyntax : function() {
@@ -212,22 +228,27 @@ _.extend(SyntaxParser.prototype, {
     };
   },
 
-  _startSymbolAsValue : function() {
+//  _startSymbolAsValue : function() {
+  _nonterminalAsValue : function() {
     var self = this;
 
-    return function startSymbolAsValue(constituents) {
-      var startSymbol = constituents[0].getData();
-      var path = getKeyPath(this.getStack());
+//    return function startSymbolAsValue(constituents) {
+    return function nonterminalAsValue(constituents) {
+      var nonterminal = constituents[0].getData();
+      var path        = getKeyPath(this.getStack());
+      var key         = null;
+      var lhs         = null;
+      var rhs         = null;
+
       path.unshift(self._startSymbol);
-      var key = path.pop();
-      console.log("Inside startSymbolAsValue, the key path is:\n", getKeyPath(this.getStack()));
-      var lhs = path.join('.') + "PAIR";
-      var rhs = 'key_' + key + " " + startSymbol;
-console.log("inside startSymbolAsValue, before pushing onto externalGrammarData, it looks like:\n", self._externalGrammarData);
+      key = path.pop();
+      lhs = path.join('.') + "PAIR";
+//      rhs = 'key_' + key + " " + startSymbol;
+      rhs = 'key_' + key + " " + nonterminal;
+
       self._externalGrammarData.push({
         production : lhs + " -> " + rhs
       });
-console.log("Inside startSymbolAsValue, after pushing, externalGrammarData looks like:\n", self._externalGrammarData);
       return constituents[0];
     };
   }
