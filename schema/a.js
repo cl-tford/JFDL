@@ -3,6 +3,7 @@ var _      = require('underscore');
 
 // Class
 var A = function A(options) {
+console.log("Constructing a new A object!!!111\n");
   _.extend(this, options);
 };
 
@@ -33,5 +34,5 @@ _.extend(A.prototype, {
 });
 
 var schemaA = new Schema(A);
-
+console.log("Inside a.js, the export is:\n", schemaA);
 module.exports = schemaA;

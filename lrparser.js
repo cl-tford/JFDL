@@ -23,7 +23,57 @@ _.extend(LRParser, {
       }
     }
     return constituents;
+  },
+
+  // Default reduction functions.
+  constructObject : function(constituents) {
+    var leftBrace     = constituents[0];
+    var keyValuePairs = constituents[1];
+    var rightBrace    = constituents[2];
+    console.log("Inside constructObject, the constituents (leftBrace, keyVAluePairs, rightBrace) are:\n", leftBrace, "\n", keyValuePairs, "\n", rightBrace);
+    
+    return new A(keyValuePairs);
+  },
+
+  absorbPair : function(constituents) {
+    var keyValuePairs = constituents[0];
+    var pair = constituents[1];
+    
+    keyValuePairs[pair.key] = pair.value;
+    return keyValuePairs;
+  },
+
+  startKeyValuePairs : function(constituents) {
+    var pair = constituents[0];
+    var keyValuePairs = {};
+    
+    keyValuePairs[pair.key] = pair.value;
+    return keyValuePairs;
+  },
+
+  recordPair : function(constituents) {
+    console.log("Inside recordPair, got called with constituents:\n", constituents);
+    var key = constituents[0].getData();
+    var value = constituents[1];
+    
+    var pair = {
+      key : key,
+      value : value
+    };
+    console.log("Inside recordPair, about to return:\n", pair);
+    return pair;
+  },
+  
+  extractNumber : function(constituents) {
+    var number = constituents[0].getData();
+    
+    return number;
+  },
+
+  transitiveUp : function(constituents) {
+    return constituents[0];
   }
+  
 });
 
 _.extend(LRParser.prototype, StackManager.prototype, {
@@ -37,14 +87,7 @@ _.extend(LRParser.prototype, StackManager.prototype, {
 
     error = error || {};
     this._prepareToParse(object);
-/*
-    this._tokenizer = new this.tokenizer({
-      object : object
-    });
-    this.initializeStack();
-    this._state = 0;
-    this._token = null;
-*/
+
     while (true) {
       this._loadToken();
       transition = this._getTransition();

@@ -1,7 +1,7 @@
 var Schema = require('./schema.js');
 var _      = require('underscore');
 var A      = require('./a.js');
-
+console.log("Inside schematest.js, after requiring A, it looks like:\n", A);
 /*
 // Class
 var A = function A(options) {
@@ -56,8 +56,9 @@ A.load({
     return console.log("Error loading testObject1:\n", err);
   }
   console.log("The result of loading testObject1 is:\n", testObject1);
+//  process.exit(1);
   console.log("The result of printing something on testObject1 is:\n", testObject1.printSomething());
-  
+  process.exit(1);
   A.load({
     "e" : 'false',
     "b" : {
