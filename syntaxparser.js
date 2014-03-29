@@ -4,7 +4,6 @@ var SyntaxTokenizer   = require('./objecttokenizer/syntaxtokenizer.js');
 var ObjectTokenizer   = require('./objecttokenizer/objecttokenizer.js');
 var _                 = require('underscore');
 var SyntaxToken       = require('./objecttokenizer/syntaxtoken.js');
-//var Module            = require('./traversal/module.js');
 
 var DEFAULT_START_SYMBOL = 'START';
 
@@ -24,7 +23,6 @@ function getKeyPath(stack) {
 var SyntaxParser = function SyntaxParser(options) {
   this._startSymbol = options.startSymbol || DEFAULT_START_SYMBOL;
   this._externalSymbols = options.externalSymbols || [];
-//  this._externalSymbols = options.externalSymbols || {};
   this._Module = options.Module
   this._grammarData = this._getGrammarData();
   this._generator = new LRParserGenerator(this._grammarData);
@@ -34,10 +32,6 @@ var SyntaxParser = function SyntaxParser(options) {
 };
 
 _.extend(SyntaxParser, {
-//  constructObject : function(constituents) {
-//  constructObject : function(Constructor) {
-
-
   absorbPair : function() {
     return function _absorbPair(constituents) {
       var keyValuePairs = constituents[0];
@@ -60,7 +54,6 @@ _.extend(SyntaxParser, {
     
   recordPair : function() {
     return function _recordPair(constituents) {
-      console.log("Inside recordPair, got called with constituents:\n", constituents);
       var key = constituents[0].getData();
       var value = constituents[1];
 
@@ -72,7 +65,6 @@ _.extend(SyntaxParser, {
         key : key,
         value : value
       };
-      console.log("Inside recordPair, about to return:\n", pair);
       return pair;
     };
   },
@@ -154,7 +146,6 @@ _.extend(SyntaxParser.prototype, {
         reduction : this._booleanAsAtom()
       }
     ];
-//    this._addExternalGrammarData(grammarData);//
     return grammarData.concat(this._getExternalGrammarData());
   },
 
@@ -165,7 +156,6 @@ _.extend(SyntaxParser.prototype, {
     _.each(self._externalSymbols, function(externalSymbol) {
       externalGrammarData.push({
         production : 'VALUE -> ' + externalSymbol,
-//        reduction  : self._nonterminalAsValue()
         reduction : SyntaxParser.transitiveUp()
       });
     });
@@ -173,13 +163,11 @@ _.extend(SyntaxParser.prototype, {
   },
 
   _getConstructor : function(symbol) {
-console.log("Inside /Users/terranceford/JFDL/syntaxparser.js._getConstructor, got called with symbol:\n", symbol);
     if (this._startSymbol === symbol ||
         this._externalSymbols.indexOf(symbol) > -1) {
-console.log("INside /Users/terranceford/JFDL/syntaxparser.js._getConstructor, about to return the semantics of:\n", this._Module.getById(symbol));
-      return this._Module.getById(symbol).semantics;
+
+      return require('/Users/terranceford/JFDL/schema/' + symbol + '/' + symbol + '.js');
     }
-console.log("Inside /Users/terranceford/JFDL/syntaxparser.js._getConstructor, about to return Object\n");
     return Object;
   },
 
@@ -203,16 +191,10 @@ console.log("Inside /Users/terranceford/JFDL/syntaxparser.js._getConstructor, ab
         production : prefix + "PAIRS -> " + prefix + "PAIR",
         reduction : SyntaxParser.startKeyValuePairs()
       });
-/*
-      productions.push({
-        production : prefix + " -> { " + prefix + "PAIRS }",
-        reduction : SyntaxParser.constructObject(this._getConstructor(path[path.length - 1])
-      });
-*/
+
       key = path.pop();
       productions.push({
         production : prefix + " -> { " + prefix + "PAIRS }",
-//        reduction : SyntaxParser.constructObject(key)
         reduction : self._constructObject(key)
       });
       if (path.length) {
@@ -222,12 +204,6 @@ console.log("Inside /Users/terranceford/JFDL/syntaxparser.js._getConstructor, ab
           reduction : SyntaxParser.recordPair()
         });
       }
-console.log("Inside /Users/terranceford/JFDL/syntaxparser.js._compressSyntax, about to return the following productions:\n", productions);
-//      productions = _.map(productions, function(productionString) {
-//        return {
-//          production : productionString
-//        };
-//      });
       Array.prototype.push.apply(self._externalGrammarData, productions);
       return "SYNTAX";
     };
@@ -254,6 +230,23 @@ console.log("Inside /Users/terranceford/JFDL/syntaxparser.js._compressSyntax, ab
     var self = this;
 
     return function compressPair(constituents) {
+      var key = constituents[0];
+      var value = constituents[1];
+      if (value.getData && typeof value.getData === 'function') {
+        if (self._externalSymbols.indexOf(value.getData()) > -1) {
+          var keyPath = getKeyPath(this.getStack());
+          keyPath.unshift(self._startSymbol);
+          lhs = keyPath.join('.') + "PAIR";
+          rhs = "key_" + key.getData() + " " +  value.getData();
+          production =  lhs + " -> " + rhs;
+          self._externalGrammarData.push({
+            production : production,
+            reduction : SyntaxParser.recordPair()
+      });
+        } else {
+          throw new Error("Caint do dat");
+        }
+      }
       return "PAIR";
     };
   },
@@ -347,15 +340,11 @@ console.log("Inside /Users/terranceford/JFDL/syntaxparser.js._compressSyntax, ab
     var self = this;
 
     return function constructObject(constituents) {
-console.log("Inside constructObject, The key is:\n", key);
       var leftBrace     = constituents[0];
       var keyValuePairs = constituents[1];
       var rightBrace    = constituents[2];
       var Constructor = self._getConstructor(key);
-      console.log("Inside constructObject, the constituents (leftBrace, keyVAluePairs, rightBrace) are:\n", leftBrace, "\n", keyValuePairs, "\n", rightBrace);
-      
-//      return new A(keyValuePairs);
-      console.log("The about to try and construct using Constructor:\n", Constructor);
+
       return new Constructor(keyValuePairs);
     };
   },

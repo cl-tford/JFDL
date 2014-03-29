@@ -1,97 +1,22 @@
-var Schema = require('./schema.js');
-var _      = require('underscore');
-var A      = require('./a.js');
-console.log("Inside schematest.js, after requiring A, it looks like:\n", A);
-/*
-// Class
-var A = function A(options) {
-  _.extend(this, options);
-};
+console.log("Inside /Users/terranceford/JFDL/schema/schematest2.js, running javascript!!!!!!!!!!!!!!!1111111111111\n");
+var A = require('./a');
 
+console.log("The result of requiring A is:\n", A);
 
+console.log("About to load a new object:\n");
 
-// Class Members
-_.extend(A, {
-  id : 'A',
-  syntax : {
-    "b" : {
-      "c" : "string",
-      "d" : "number"
-    },
-    "e" : "boolean",
-    "f" : "F"
-  },
-  dependencies : ['F']
-});
-
-// Instance Methods
-_.extend(A.prototype, {
-  printSomething : function() {
-    if (this.e) {
-      return this.b.c;
-    } else {
-      return this.b.d;
-    }
-  }
-});
-
-var schemaA = new Schema(A);
-
-*/
-console.log("About to load an object:\n");
-
-A.load({
-  "b" : {
-    "c" : "string",
-    "d" : 2
-  },
-  "e" : true,
-  "a" : {
-    "b" : {
-      "c" : 'hello'
-    }
-  }
-}, function(err, testObject1) {
-  if (err) {
-    return console.log("Error loading testObject1:\n", err);
-  }
-  console.log("The result of loading testObject1 is:\n", testObject1);
-//  process.exit(1);
-  console.log("The result of printing something on testObject1 is:\n", testObject1.printSomething());
-  process.exit(1);
-  A.load({
-    "e" : 'false',
-    "b" : {
-      "c" : "string",
-      "d" : 2
-    }
-  }, function(err, testObject2) {
-    if (err) {
-      return console.log("Error loading testObject2:\n", err);
-    }
-    console.log("The result of loading testObject2 is:\n", testObject2);
-    console.log("The result of printing something on testObject2 is:\n", testObject2.printSomething());
-  });
-
-  A.load({
-    "e" : false,
-    "b" : {
-      "c" : "string",
-      "d" : 2
-    },
-    "f" : {
-      "bb" : {
-        "cc" : 'holy',
-        "dd" : 667
+var testJson1 = {
+  "f" : {
+    "bb" : 6534,
+    "a" : {
+      "f" : {
+        "bb" : 6534
       }
     }
-  }, function(err, testObject3) {
-    if (err) {
-      return console.log("Error loading testObject2:\n", err);
-    }
-    console.log("The result of loading testObject2 is:\n", testObject3);
-    console.log("The result of printing something on testObject3 is:\n", testObject3.printSomething());
-    console.log("The result of printing something on testObject3.f is:\n", testObject3.f.printSomething());
-  });
+  }
+};
 
+A.load(testJson1, function(err, testObject1) {
+  console.log("After loading the testJson1, inside the A.load callback, got called with err, testObject1:\n", err, "\n", testObject1);
+  console.log("The result of calling printSomething on testObject1 is:\n", testObject1.printSomething());
 });
