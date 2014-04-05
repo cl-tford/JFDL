@@ -1,8 +1,0 @@
-{
-  "id" : "F",
-  "syntax" : {
-    "bb" : "number",
-    "a"  : "A"
-  },
-  "dependencies" : ["A"]
-}

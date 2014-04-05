@@ -23,7 +23,8 @@ function getKeyPath(stack) {
 var SyntaxParser = function SyntaxParser(options) {
   this._startSymbol = options.startSymbol || DEFAULT_START_SYMBOL;
   this._externalSymbols = options.externalSymbols || [];
-  this._Module = options.Module
+  this._Module = options.Module;
+  this._schema = options.schema;
   this._grammarData = this._getGrammarData();
   this._generator = new LRParserGenerator(this._grammarData);
   this._parser = this._generator.generate(SyntaxTokenizer);
@@ -166,7 +167,7 @@ _.extend(SyntaxParser.prototype, {
     if (this._startSymbol === symbol ||
         this._externalSymbols.indexOf(symbol) > -1) {
 
-      return require('/Users/terranceford/JFDL/schema/' + symbol + '/' + symbol + '.js');
+      return this._schema.getNeighbor(symbol).getConstructor();
     }
     return Object;
   },
