@@ -21,7 +21,6 @@ function defaultBody(options) {
 var DIRECTORY = __dirname;
 
 var Schema = function Schema(options) {
-console.log("Inside Schema constructor, got called, and __dirname is:\n", __dirname);
   this._id = options.id;
   this._dependencies = options.dependencies;
   this._syntax = options.syntax;
